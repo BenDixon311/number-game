@@ -6,7 +6,7 @@ const NumberBox = props => {
 
     return (
 
-        <button onClick={() => console.log('num', props.displayNum)}
+        <button onClick={() => props.onClick(props.displayNum, props.status)}
             className="number"
             style={{ backgroundColor: colors[props.status] }}
         >
