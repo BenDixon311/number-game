@@ -1,5 +1,5 @@
 // STAR MATCH - Starting Template
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import NumberBox from './NumberBox';
 import Star from './Star';
 import './StarMatch.css'
@@ -7,6 +7,9 @@ import './StarMatch.css'
 
 const PlayAgain = props => (
     <div className="game-done">
+      <div className="message" style={{color: props.gameState === 'lost' ? 'red' : 'green'}}>
+        {props.gameStatus === 'lost' ? 'Game Over' : 'Good job!'}
+      </div>
         <button onClick={() => props.onClick()}>Play Again!</button>
     </div>
 );
@@ -16,12 +19,28 @@ const StarMatch = () => {
     const [stars, setStars] = useState(utils.random(1, 9))
     const [availableNums, setAvailableNums] = useState(utils.range(1, 9));
     const [candidateNums, setCandidateNums] = useState([]);
+    const [secondsLeft, setSecondsLeft] = useState(10);
+
+    //useEffect renders every time the state changes. We change the state every 1 second
+    //from the inner setTimeout function
+    useEffect(() => {
+      if (secondsLeft > 0) {
+        const timerId = setTimeout(() => {
+          setSecondsLeft(secondsLeft - 1);
+        }, 1000)
+
+        //clean up to make sure a timer is removed before it tries to make another timer
+        return () => clearTimeout(timerId);
+      }
+      
+    });
 
 //computations based on the state
     const candidatesAreWrong = utils.sum(candidateNums) > stars;
-    const gameIsDone = availableNums.length === 0;
+    const gameStatus = availableNums.length === 0 ? 'won'
+    : secondsLeft === 0 ? 'lost' : 'active'
 
-//functions
+//functions (always check to see if any of these can be turned into 'computations based on the state')
     //reset state to initial values.
     const resetGame = () => {
         setStars(utils.random(1,0))
@@ -73,7 +92,7 @@ const StarMatch = () => {
         </div>
         <div className="body">
           <div className="left">
-                {gameIsDone ? (<PlayAgain onClick={resetGame} />) : (<Star count = {stars} />)}
+                {gameStatus !== 'active' ? (<PlayAgain onClick={resetGame} gameStatus={gameStatus} />) : (<Star count = {stars} />)}
           </div>
           <div className="right">
           {utils.range(1, 9).map(number => 
