@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import StarMatch from './components/StarMatch'
 import './App.css';
 
